@@ -1,0 +1,1 @@
+java -cp "C:\Users\utente\Desktop\XSL_Auto" Main && fop -xml dati_def.xml -xsl PDF_riass.xsl -pdf output.pdf && output.pdf
