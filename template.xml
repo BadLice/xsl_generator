@@ -4,6 +4,8 @@
 		<doc_init_image>true</doc_init_image>
 		<doc_init_title>Ciak in Lombardia</doc_init_title>
 		<doc_init_type>Adesione</doc_init_type>
+		<doc_init_color_fieldset>black</doc_init_color_fieldset>
+		<doc_init_color_module>blue</doc_init_color_module>
 	</Document>
 
 	<Fieldset label="Dati generali">

@@ -68,6 +68,14 @@ class xmlDecoder
 							Main.drawImage();
 					break;
 
+					case "doc_init_color_fieldset":
+						Main.colorCodeFieldset = currNode.getTextContent().toLowerCase();
+					break;
+
+					case "doc_init_color_module":
+						Main.colorCodeModule = currNode.getTextContent().toLowerCase();
+					break;
+
 					case "document":
 						if (currNode.hasChildNodes())
 						{

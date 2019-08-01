@@ -6,6 +6,9 @@ class Main
 	public static Writer writer;
 	public static String fileName = "PDF_riass.xsl";
 	public static String xmlDataFile = "dati_def.xml";
+	public static String colorCodeFieldset = "#04813e";
+	public static String colorCodeModule = "#5c5c5c";
+
 
 	public static void main(String[] args) 
 	{
@@ -159,7 +162,8 @@ class Main
 		try
 		{
 			System.out.println("Setting document title: "+escapeChar(title));
-			writer.write("<fo:block white-space-treatment=\"preserve\" font-size=\"16pt\" font-weight=\"bold\" text-align=\"center\" space-before=\"5mm\" space-after=\"5mm\">"+escapeChar(title)+"</fo:block>");
+			writer.write("<fo:block white-space-treatment=\"preserve\" padding-top=\"4px\" font-size=\"16pt\" font-weight=\"bold\"  text-align=\"center\" background-color=\"white\" border=\"1px solid "+colorCodeFieldset+"\" space-after=\"4mm\" space-before=\"4mm\">"+escapeChar(title)+"</fo:block>");
+
 		}
 		catch (Exception e)
 		{
@@ -173,7 +177,7 @@ class Main
 		try
 		{
 			System.out.println("Setting document type: "+escapeChar(type));
-			writer.write("<fo:block white-space-treatment=\"preserve\" break-before=\"page\" font-size=\"14pt\" font-weight=\"bold\" text-align=\"center\" space-after=\"10mm\">"+escapeChar(type)+"</fo:block>");
+			writer.write("<fo:block white-space-treatment=\"preserve\" padding-top=\"4px\" font-size=\"11pt\" font-weight=\"bold\" break-before=\"page\" text-align=\"center\" background-color=\"white\" border=\"1px solid black\" space-after=\"4mm\" space-before=\"4mm\">"+escapeChar(type)+"</fo:block>");
 		}
 		catch (Exception e)
 		{
@@ -190,7 +194,7 @@ class Main
 			if(label != null && !label.trim().equals(""))
 				writer.write("<fo:block white-space-treatment=\"preserve\" font-size=\"11pt\" font-weight=\"bold\" text-align=\"center\" background-color=\"#d0d0d0\" space-after=\"4mm\" space-before=\"4mm\">"+escapeChar(label)+"</fo:block>");
 			if(name != null && !name.trim().equals(""))
-				writer.write("<fo:block white-space-treatment=\"preserve\" font-size=\"11pt\" font-weight=\"bold\" text-align=\"center\"  space-after=\"4mm\" space-before=\"4mm\">"+escapeChar(name)+"</fo:block>");
+				writer.write("<fo:block white-space-treatment=\"preserve\" color=\""+colorCodeModule+"\" font-size=\"11pt\" font-weight=\"bold\" text-align=\"center\"  space-after=\"4mm\" space-before=\"4mm\">"+escapeChar(name)+"</fo:block>");
 		}
 		catch (Exception e)
 		{
@@ -211,7 +215,7 @@ class Main
 				writer.write("<xsl:if test='/_/"+escapeChar(itemList.get(0).name)+"'>");
 
 			System.out.println("Opening fieldset <<"+escapeChar(itemList.get(0).fieldset.name)+">>");
-			writer.write("<fo:block white-space-treatment=\"preserve\" font-size=\"11pt\" font-weight=\"bold\" text-align=\"left\" space-after=\"2mm\">"+escapeChar(itemList.get(0).fieldset.name.toUpperCase())+"</fo:block>");
+			writer.write("<fo:block white-space-treatment=\"preserve\" color=\""+colorCodeFieldset+"\" font-size=\"11pt\" font-weight=\"bold\" text-align=\"left\" space-after=\"2mm\">"+escapeChar(itemList.get(0).fieldset.name.toUpperCase())+"</fo:block>");
 			
 			writer.write("<fo:table table-layout=\"fixed\" width=\"170mm\" space-after=\"2mm\" border-spacing=\"0pt 2pt\" border-bottom-style=\"solid\"><fo:table-column column-width=\"120mm\" /><fo:table-column column-width=\"50mm\" /><fo:table-body>");
 
@@ -366,7 +370,7 @@ class Main
 				}
 
 				if(i == itemList.size()-1)
-					writer.write("<fo:table-row border-bottom=\"1pt dotted #3b8741\"><fo:table-cell font-size=\"1pt\" padding-after=\"0mm\" padding-before=\"0mm\"><fo:block white-space-treatment=\"preserve\"> </fo:block></fo:table-cell></fo:table-row>	");
+					writer.write("<fo:table-row border-bottom=\"1pt dotted "+colorCodeFieldset+"\"><fo:table-cell font-size=\"1pt\" padding-after=\"0mm\" padding-before=\"0mm\"><fo:block white-space-treatment=\"preserve\"> </fo:block></fo:table-cell></fo:table-row>	");
 
 				if(o.ifCondition.length()>0)
 					writer.write("</xsl:if>");

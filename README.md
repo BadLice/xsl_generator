@@ -9,6 +9,15 @@ struttura del file template.xml:
 </_>
 
 tipi di oggetti del template:
+0. Document = oggetto che definisce le impostazioni del documento
+da inserire sempre PER PRIMO
+tag che deve contenere: 
+	- doc_init_image: valorizzato a true se va inserito il logo all'inizio del documento
+	- doc_init_title: titolo del documento
+	- doc_init_type: fase del documento
+	- doc_init_color_fieldset: [opzionale] colore del testo dei fieldset
+	- doc_init_color_module: [opzionale] colore del testo dei moduli
+
 1. Module = modulo del template
 Attributi: 
 	- label: Commento del modulo (ad esempio "MODULO 1 DI 4") 
