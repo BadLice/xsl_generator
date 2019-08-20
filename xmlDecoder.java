@@ -6,11 +6,87 @@ import java.io.*;
 class xmlDecoder
 {
 	static Fieldset currFieldset;
-
 	static ArrayList<SubModule> subModuleList = new ArrayList<SubModule>();
+	static boolean xmlRead=false;
+	static boolean xslRead=false;
 
+	//starts recursive documents file reading
+	public static void readDocumentsName()
+	{
+		int level = 0;
+		ArrayList<Item> templateItems = new ArrayList<Item>();
 
-	xmlDecoder()
+		try
+		{
+			File file = new File("template.xml");
+			DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+			Document doc = dBuilder.parse(file);
+
+			if(!doc.getDocumentElement().getNodeName().equals("_"))
+			{
+				System.out.println("Missing or invalid root name.\nThe 'template.xml' document must have '<_>' as root element");
+				System.exit(0);
+			}
+
+			if (doc.getDocumentElement().hasChildNodes())
+				intoNodeDocumentsName(doc.getDocumentElement().getChildNodes(),level);
+			xmlDecoder.currFieldset = null;
+			xmlDecoder.subModuleList.clear();
+
+		}
+		catch (Exception e)
+		{
+			System.err.println("ERROR in <<readDocumentsName>>: "+e);
+		}
+	}
+
+	//recursive function: reads output file names from xml "template"
+	private static void intoNodeDocumentsName(NodeList nodeList,int level) 
+	{
+		ArrayList<Item> itemList = new ArrayList<Item>();
+
+	    for (int count = 0; count < nodeList.getLength(); count++)
+	    {
+
+			Node currNode = nodeList.item(count);
+
+			if (currNode.getNodeType() == Node.ELEMENT_NODE)
+			{
+
+				switch(currNode.getNodeName().toLowerCase())
+				{
+					case "xml_file_name":
+						Main.xmlDataFile = currNode.getTextContent();
+						xmlDecoder.xmlRead=true;
+						System.out.println("Setting xml document name: "+Main.xmlDataFile);
+					break;
+
+					case "xsl_file_name":
+						Main.fileName = currNode.getTextContent();
+						xmlDecoder.xslRead=true;
+						System.out.println("Setting xsl document name: "+Main.fileName);
+					break;
+
+					case "document":
+						if (currNode.hasChildNodes())
+							intoNodeDocumentsName(currNode.getChildNodes(),level);
+					break;
+				}
+			}
+
+			if(xslRead && xmlRead)
+				return;
+		}
+
+		if(level!=0)
+			Main.createSubmoduleList(subModuleList.get(level-1),itemList);
+		else
+		if(itemList.size()>0)
+			Main.createItemList(itemList);
+	}
+
+	//starts recursive template reading
+	public static void readXmlInputFile()
 	{
 		int level = 0;
 		ArrayList<Item> templateItems = new ArrayList<Item>();
@@ -29,15 +105,14 @@ class xmlDecoder
 
 			if (doc.getDocumentElement().hasChildNodes())
 				intoNode(doc.getDocumentElement().getChildNodes(),level);
-
-	    }
-	    catch (Exception e)
-	    {
-			System.out.println(e.getMessage());
-	    }
-                   
+		}
+		catch (Exception e)
+		{
+			System.err.println("ERROR in <<readXmlInputFile>>: "+e);
+		}
 	}
 
+	//recursive function: reads each item of xml "template"
 	private static void intoNode(NodeList nodeList,int level) 
 	{
 		ArrayList<Item> itemList = new ArrayList<Item>();
@@ -54,6 +129,10 @@ class xmlDecoder
 
 				switch(currNode.getNodeName().toLowerCase())
 				{
+					//dont consider the following items:
+					case "xml_file_name":
+					case "xsl_file_name":
+					break;
 
 					case "doc_init_title":
 						Main.setTitle(currNode.getTextContent());
@@ -78,9 +157,7 @@ class xmlDecoder
 
 					case "document":
 						if (currNode.hasChildNodes())
-						{
 							intoNode(currNode.getChildNodes(),level);
-						}
 					break;
 
 					case "module":
@@ -232,7 +309,5 @@ class xmlDecoder
 		else
 		if(itemList.size()>0)
 			Main.createItemList(itemList);
-
-
-    }
+	}
 }

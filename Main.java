@@ -16,23 +16,49 @@ class Main
 		{
 			System.out.println("----------------------------------- STARTING GENERATION -----------------------------------\n\n");
 
+			xmlDecoder.readDocumentsName();
 			escapeCharXmlDataFile();
 			initDocument();
-			new xmlDecoder();
+			xmlDecoder.readXmlInputFile();
 			saveDocument();
-
 			System.out.println("----------------------------------- FINISHED GENERATION -----------------------------------\n\n");
+			
+			launchApacheFop();
+
 
 		}
 		catch(Exception e)
 		{
-			System.out.println("ERROR in <<main>>: "+e);
+			System.err.println("ERROR in <<main>>: "+e);
 			System.exit(0);
+		}
+	}
+
+	public static void launchApacheFop()
+	{
+		try
+		{
+			System.out.println("Running: fop -xml "+xmlDataFile+" -xsl "+fileName+" -pdf output.pdf && output.pdf");
+
+			ProcessBuilder pb = new ProcessBuilder("cmd","/c fop -xml "+xmlDataFile+" -xsl "+fileName+" -pdf output.pdf && output.pdf");
+			pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+			pb.redirectError(ProcessBuilder.Redirect.INHERIT);
+			Process p = pb.start();
+		}
+		catch (Exception e) 
+		{
+			System.err.println("ERROR in <<launchApacheFop>>: "+e);
+			System.exit(0); 
 		}
 	}
 
 	public static String escapeApostrophe(String txt) //experimetal
 	{
+		// System.out.println("---------------------- TEST -------------------");
+		// 	for(int i=0;i<txt.length();i++)
+		// 		System.out.println((byte)txt.charAt(i));
+		// 	System.out.println("---------------------- TEST -------------------");
+
 		ArrayList<Character> l = new ArrayList<Character>();
 		
 		for(int i=0;i<txt.length();i++)
@@ -52,10 +78,34 @@ class Main
 				l.remove(i+1);
 			}
 
+			if((byte) l.get(i).charValue()== -62 && (byte) l.get(i+1).charValue() == -128 && (byte) l.get(i+2).charValue() == -103)
+			{
+				//System.out.println("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& apostrophe escaped");
+				l.set(i,'\'');
+				l.remove(i+1);
+				l.remove(i+1);
+			}
+
 			if((byte) l.get(i).charValue()== -30 && (byte) l.get(i+1).charValue() == -128 && (byte) l.get(i+2).charValue() == -103)
 			{
 				//System.out.println("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& apostrophe escaped");
 				l.set(i,'\'');
+				l.remove(i+1);
+				l.remove(i+1);
+			}
+
+			if((byte) l.get(i).charValue()== -30 && (byte) l.get(i+1).charValue() == -128 && (byte) l.get(i+2).charValue() == -100)
+			{
+				//System.out.println("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& apostrophe escaped");
+				l.set(i,'\"');
+				l.remove(i+1);
+				l.remove(i+1);
+			}
+
+			if((byte) l.get(i).charValue()== -30 && (byte) l.get(i+1).charValue() == -128 && (byte) l.get(i+2).charValue() == -99)
+			{
+				//System.out.println("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& apostrophe escaped");
+				l.set(i,'\"');
 				l.remove(i+1);
 				l.remove(i+1);
 			}
@@ -77,6 +127,7 @@ class Main
 		txt = txt.replace("è","&#232;");
 		txt = txt.replace("é","&#233;");
 		txt = txt.replace("°","&#176;");
+		txt = txt.replace("À","&#192;");
 		txt = txt.replace("‘","'");
 		txt = txt.replace("’","'");
 		txt = txt.replace("€","&#8364;");
@@ -120,7 +171,7 @@ class Main
 		}
 		catch(Exception e)
 		{
-			System.out.println("ERROR in <<escapeCharXmlDataFile>>: "+e);
+			System.err.println("ERROR in <<escapeCharXmlDataFile>>: "+e);
 			System.exit(0);
 		}
 	}
@@ -151,7 +202,7 @@ class Main
 		catch (IOException e)
 		{
 			e.printStackTrace();
-			System.out.println("ERROR in <<drawImage>>: "+e);
+			System.err.println("ERROR in <<drawImage>>: "+e);
 			System.exit(0);
 		}
 	}
@@ -167,7 +218,7 @@ class Main
 		}
 		catch (Exception e)
 		{
-			System.out.println("ERROR in <<setTitle>>: "+e);
+			System.err.println("ERROR in <<setTitle>>: "+e);
 			System.exit(0);
 		}
 	}
@@ -181,7 +232,7 @@ class Main
 		}
 		catch (Exception e)
 		{
-			System.out.println("ERROR in <<setDocumentType>>: "+e);
+			System.err.println("ERROR in <<setDocumentType>>: "+e);
 			System.exit(0);
 		}
 	}
@@ -198,7 +249,7 @@ class Main
 		}
 		catch (Exception e)
 		{
-			System.out.println("ERROR in <<createModule>>: "+e);
+			System.err.println("ERROR in <<createModule>>: "+e);
 			System.exit(0);
 		}
 	}
@@ -223,7 +274,7 @@ class Main
 			{
 				Item o = itemList.get(i);
 
-				System.out.println("Creating item <<"+escapeChar(o.name)+">> with options:\n\t- label: "+escapeChar(o.label)+"\n\t- file: "+o.file+"\n\t- if: "+o.ifCondition+"\n\t- integer: "+o.integer);
+				System.out.println("Creating item <<"+escapeChar(o.name)+">> with options:\n\t- label: "+escapeChar(o.label)+"\n\t- file: "+o.file+"\n\t- if: "+o.ifCondition+"\n\t- integer: "+o.integer+"\n\t- euro: "+o.euro);
 
 				//item if condition
 				if(o.ifCondition.length()>0)
@@ -280,7 +331,7 @@ class Main
 		}
 		catch (Exception e)
 		{
-			System.out.println("ERROR in <<createItemList>>: "+e);
+			System.err.println("ERROR in <<createItemList>>: "+e);
 			System.exit(0);
 		}
 	}
@@ -292,13 +343,13 @@ class Main
 			System.out.println("Opening submodule <<"+sub.name+">>");
 			//this xsl structure isn't goood for innested submodules (2+ level)
 			writer.write("<xsl:if test='/_/"+sub.name+"_0."+sub.requiredItem+"'>");
-			writer.write("<fo:block white-space-treatment=\"preserve\" font-size=\"11pt\" font-weight=\"bold\" text-align=\"left\" space-after=\"2mm\">"+escapeChar(sub.label.toUpperCase())+"</fo:block>");
+			writer.write("<fo:block white-space-treatment=\"preserve\" font-size=\"11pt\" font-weight=\"bold\" text-align=\"left\" space-after=\"2mm\" color=\""+colorCodeFieldset+"\">"+escapeChar(sub.label.toUpperCase())+"</fo:block>");
 			writer.write("<fo:table table-layout=\"fixed\" width=\"170mm\" space-after=\"2mm\" border-spacing=\"0pt 2pt\" border-bottom-style=\"solid\"><fo:table-body>");
 			writer.write("<xsl:for-each select='(/_/*[starts-with(name(),\""+(sub.name)+"_\") and contains(name(),\"."+sub.requiredItem+"\")])'>");
 		}
 		catch (Exception e)
 		{
-			System.out.println("ERROR in <<initSubmodule>>: "+e);
+			System.err.println("ERROR in <<initSubmodule>>: "+e);
 			System.exit(0);
 		}
 	}
@@ -312,7 +363,7 @@ class Main
 		}
 		catch (Exception e)
 		{
-			System.out.println("ERROR in <<closeSubmodule>>: "+e);
+			System.err.println("ERROR in <<closeSubmodule>>: "+e);
 			System.exit(0);
 		}
 	}
@@ -326,7 +377,7 @@ class Main
 			for(int i=0; i<itemList.size();i++)
 			{
 				Item o = itemList.get(i);
-				System.out.println("Creating submodule item <<"+escapeChar(o.name)+">> with options:\n\t- label: "+escapeChar(o.label)+"\n\t- file: "+o.file+"\n\t- if: "+o.ifCondition+"\n\t- integer: "+o.integer);
+				System.out.println("Creating submodule item <<"+escapeChar(o.name)+">> with options:\n\t- label: "+escapeChar(o.label)+"\n\t- file: "+o.file+"\n\t- if: "+o.ifCondition+"\n\t- integer: "+o.integer+"\n\t- euro: "+o.euro);
 
 				//item if condition
 				if(o.ifCondition.length()>0)
@@ -378,7 +429,7 @@ class Main
 		}
 		catch (Exception e)
 		{
-			System.out.println("ERROR in <<createModule>>: "+e);
+			System.err.println("ERROR in <<createModule>>: "+e);
 			System.exit(0);
 		}
 	}
